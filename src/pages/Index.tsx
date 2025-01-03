@@ -19,6 +19,18 @@ const lifeAreas = [
 const Index = () => {
   const [chartData, setChartData] = useState([]);
 
+  useEffect(() => {
+    const savedLifeAreas = localStorage.getItem('lifeAreas');
+    if (savedLifeAreas) {
+      const parsedAreas = JSON.parse(savedLifeAreas);
+      const formattedData = parsedAreas.map((area: any) => ({
+        subject: area.name,
+        value: area.rating,
+      }));
+      setChartData(formattedData);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen p-6 space-y-6 bg-gradient-to-br from-background to-muted">
       <h1 className="text-4xl font-bold text-center mb-10 fade-in">

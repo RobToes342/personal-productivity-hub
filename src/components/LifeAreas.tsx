@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from './ui/card';
 import { Slider } from './ui/slider';
+import { toast } from 'sonner';
 
 interface LifeArea {
   id: string;
@@ -21,7 +22,15 @@ const initialLifeAreas: LifeArea[] = [
 ];
 
 export function LifeAreas() {
-  const [lifeAreas, setLifeAreas] = useState<LifeArea[]>(initialLifeAreas);
+  const [lifeAreas, setLifeAreas] = useState<LifeArea[]>(() => {
+    const saved = localStorage.getItem('lifeAreas');
+    return saved ? JSON.parse(saved) : initialLifeAreas;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('lifeAreas', JSON.stringify(lifeAreas));
+    toast.success('Bewertungen gespeichert');
+  }, [lifeAreas]);
 
   const handleRatingChange = (id: string, newRating: number[]) => {
     setLifeAreas(areas =>

@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Checkbox } from './ui/checkbox';
 import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Todo {
   id: string;
@@ -13,8 +14,18 @@ interface Todo {
 }
 
 export function TodoList({ area }: { area: string }) {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState<Todo[]>(() => {
+    const saved = localStorage.getItem(`todos-${area}`);
+    return saved ? JSON.parse(saved) : [];
+  });
   const [newTodo, setNewTodo] = useState('');
+
+  useEffect(() => {
+    localStorage.setItem(`todos-${area}`, JSON.stringify(todos));
+    if (todos.length > 0) {
+      toast.success('Todos gespeichert');
+    }
+  }, [todos, area]);
 
   const addTodo = () => {
     if (!newTodo.trim()) return;
