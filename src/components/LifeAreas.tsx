@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from './ui/card';
 import { Slider } from './ui/slider';
-import { toast } from 'sonner';
 
 interface LifeArea {
   id: string;
   name: string;
   rating: number;
+}
+
+interface LifeAreaHistory {
+  date: string;
+  ratings: LifeArea[];
 }
 
 const initialLifeAreas: LifeArea[] = [
@@ -29,7 +33,19 @@ export function LifeAreas() {
 
   useEffect(() => {
     localStorage.setItem('lifeAreas', JSON.stringify(lifeAreas));
-    toast.success('Bewertungen gespeichert');
+    
+    // Speichere den Verlauf
+    const history = JSON.parse(localStorage.getItem('lifeAreasHistory') || '[]') as LifeAreaHistory[];
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Prüfe ob heute schon ein Eintrag existiert
+    const todayExists = history.some(entry => entry.date === today);
+    
+    if (!todayExists) {
+      const newHistory = [...history, { date: today, ratings: lifeAreas }]
+        .slice(-30); // Behalte nur die letzten 30 Tage
+      localStorage.setItem('lifeAreasHistory', JSON.stringify(newHistory));
+    }
   }, [lifeAreas]);
 
   const handleRatingChange = (id: string, newRating: number[]) => {
